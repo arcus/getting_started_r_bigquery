@@ -1,0 +1,149 @@
+---
+title: "SQL in BigQuery"
+format: revealjs
+editor: visual
+---
+
+---
+
+This slide deck was built in Quarto!
+
+-   Use keyboard arrow keys to
+    -   advance ( → ) and
+    -   go back ( ← )
+-   Type "s" to see speaker notes
+-   Type "?" to see other keyboard shortcuts
+
+```{r echo = FALSE}
+library(countdown)
+```
+
+
+SQL Refresher and SQL in BigQuery
+SELECT +  FROM  +  WHERE;
+
+SELECT 
+  cabin, high_score 
+FROM
+  camp_kickball_tournament
+WHERE 
+  high_score < 10;
+
+Main pattern we go back to over and over…
+
+
+cabin
+high_score
+wins
+losses
+Yellow
+10
+3
+0
+Blue
+7
+2
+1
+Orange
+9
+1
+2
+camp_kickball_tournament
+22
+SQL, or Structured Query Language, is used to get information from a database that stores data in tables.  Tables have rows, which are individual records, and columns, which are the values that are included in a record.  Consider, for example, this pretend table called camp_kickball_tournament.  
+
+Aliases (AS)
+SELECT +  FROM  +  WHERE;
+SELECT 
+  cabin, 
+  high_score,
+  wins/(wins + losses) AS prop_win
+FROM
+  camp_kickball_tournament
+WHERE 
+  high_score < 10;
+
+Main pattern we go back to over and over…
+
+
+23
+cabin
+high_score
+wins
+losses
+Yellow
+10
+3
+0
+Blue
+7
+2
+1
+Orange
+9
+1
+2
+camp_kickball_tournament
+
+Whitespace / Capitalization
+SELECT 
+  cabin, 
+  high_score,
+  wins/(wins + losses) AS prop_win
+FROM
+  camp_kickball_tournament
+WHERE 
+  high_score < 10;
+
+select cabin,high_score,wins/(wins + losses) as prop_win from camp_kickball_tournament where high_score < 10;
+
+Both are valid, but one will make future-you happier.
+
+Lots of digital ink has been spilled on the "right" way to structure SQL queries but it boils down to:
+
+Be consistent (reduce cognitive load on teammates / future you)
+Capitalize key words so they stand out
+Indent the parts of your query
+Consider using a new line for every field
+
+24
+:40
+
+Itinerary for first section
+Getting Started in GCP
+BigQuery
+SQL Refresher
+Break
+
+01
+25
+
+
+
+Arrive
+01
+Getting started with Google Cloud Platform and BigQuery
+Query
+02
+Practice SQL queries and gain experience using BigQuery 
+Integrate
+03
+Use Colab notebooks to work with your data outside of BigQuery
+Visualize
+04
+Use Folium to create maps of geographic data
+Our Itinerary
+26
+
+Itinerary for second section
+Your first BigQuery query
+Save your work
+Grouping and aggregation
+JOINs
+Break
+
+02
+27
+First hour today we'll begin by getting you set up to use Google Cloud Platform and get you started in BigQuery.  We'll go over a bit of SQL to refresh your memory or give you some basics, and then I will show how you can save your interim data sets as well as your queries and materialized views.  We'll end with a break.
+
+

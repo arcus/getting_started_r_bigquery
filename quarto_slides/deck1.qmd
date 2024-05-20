@@ -1,0 +1,314 @@
+---
+title: "Getting Started: R and BigQuery"
+format: 
+  revealjs:
+    theme: [serif, custom.scss]
+    scrollable: true
+    footer: Joy Payton, Children's Hospital of Philadelphia
+    css: styles.css
+editor: visual
+---
+
+# Before we get started {.smaller}
+
+Please use a computer and network that will allow you to use Google products (gmail, Google Drive, etc.). **Some workplaces do not allow this on their devices!**
+
+If you don't already have a **personal (not work)** Google Cloud Platform account, you will set one up in the first section of today's course. You will need:
+
+* a mobile phone number and 
+* a credit card, but **will not be charged.** 
+
+If you're an established GCP user, you might be past your "free tier" usage this month and may accrue a small charge for today's work, but it's unlikely.
+
+::: notes
+
+Hi everyone, welcome to today's course on First Steps with Google BigQuery. A few notes before we get started. If you are using a work computer or a work network, like a VPN, you are likely to encounter some difficulties with today's activities. I know in our healthcare environments, there are often some restrictions placed on Google services and websites. So, now might be a good time to log off the VPN or fire up your personal laptop. I promise you will be able to catch up and now is a good time to switch computers.
+
+Additionally, I suggest that you use a personal Google Cloud Platform account, **even if you already have a work account**. If you're using a work GCP account, you might not have all of the permissions granted to you that you will need to complete today's tasks. We will take some time out at the beginning of this workshop to allow you to set up a new personal Google Cloud Platform account, if needed.
+
+:::
+
+------------------------------------------------------------------------
+
+This slide deck was built in Quarto!
+
+-   Use keyboard arrow keys to
+    -   advance ( → ) and
+    -   go back ( ← )
+-   Type "s" to see speaker notes
+-   Type "?" to see other keyboard shortcuts
+
+```{r echo = FALSE}
+library(countdown)
+```
+
+::: notes
+
+Just a few notes about this slide deck, which was built in Quarto (so I did the development of this deck in RStudio). If you want to use your own copy of the slides, in order to go faster or slower or to reuse this presentation in your own institution, you can find the deck at ..... . These commands, shown on your screen, will help you navigate through the slides if you're using your own copy.
+
+:::
+
+# About Your Presenter
+
+Joy Payton (she/her) 
+
+Data Scientist / Data Educator 
+
+[https://www.linkedin.com/in/joypayton/](https://www.linkedin.com/in/joypayton/)
+
+I have no conflicts of interest to report.
+
+::: notes 
+
+So I haven't properly introduced myself yet, so let's do that!  My name is Joy Payton and I use she/her pronouns. My primary job is as a teaching data scientist at the Children's Hospital of Philadelphia, the Nation's first hospital for children. You can reach me by contacting me on LinkedIn, and I love networking with learners, so don't be shy about reaching out. I have no conflicts of interest to report, but I am in fact actively interested in developing conflicts of interest, so feel free to reach out to me!
+
+:::
+
+# Materials for Today
+
+Please grab these links and use them!
+
+This slide show: (once you open the slide show you can use 's' to open speaker notes) GitHub repository:
+
+::: notes 
+
+Importantly, in a live class not everyone moves at the same pace so I strongly encourage you to grab these links and use them. If you want to skip ahead or hang back today, that's completely fine, and I want you to have access to the slides so you can do that.
+
+This slide deck is built in Quarto, and if you have them open in a web browser, you can use the question mark on your keyboard to discover the various keyboard shortcuts you can do. 
+
+I have extra slides that I probably won't show in the workshop today, but are included in the deck so that you can go deeper if you want to, whether that's today or afterwards. Additionally, there's a GitHub repo for the course and that link is provided as well.
+
+Finally, feedback is incredibly important to me, because it's how I can improve as an instructor. Please feel free to tell me if I'm talking too fast or too quietly, and please provide feedback when the conference organizers request it. Your honest feedback helps the R/Medicine conference mentor and support instructors like me.
+
+:::
+
+# Our Itinerary
+
+\[Table here\]
+
+::: notes 
+
+We have a three hour course today, and we'll give time for breaks along the way. Our itinerary is as follows. 
+
+Our first hour, we're concentrating just on arriving – arriving to Google Cloud Platform and BigQuery. We'll start to dip our toes into GCP and understand a little bit more about BigQuery. Then, after a break, we'll go into the second hour, which concentrates on querying in SQL. If you have experience in SQL that's great, because we're going to move into intermediate-to-advanced SQL. If this is your first time, you may find some of this material challenging, but you're going to be leaving with access to all the SQL code we're working with, and can continue to review it after you finish the course. In our third hour, we'll work on integrating our data into R.
+
+:::
+
+# Itinerary for First Hour
+
+::: notes
+
+First hour today we'll begin by getting you set up to use Google Cloud Platform and get you started in BigQuery. We'll go over a bit of SQL to refresh your memory or give you some basics, and then I will show how you can save your interim data sets as well as your queries and materialized views. We'll end with a break.
+
+:::
+
+## Getting Started in GCP
+
+If you already have a GCP account that you'll be using for this workshop
+
+**Option A:** go get a cup of coffee and we'll see you back here in about 10 minutes. You might end up spending money on our activities today!
+
+**Option B:** stick around to create a new account with a brand new "welcome to GCP" free trial worth \$300 in GCP services
+
+## Getting Started in GCP{.smaller}
+
+
+If you need to create a new Google identity, please go to [https://accounts.google.com](https://accounts.google.com) now and create a new account. Even if you already have one, this is a way to guarantee you'll be working in the free tier with some Google credits!
+
+![](media/account_creation_1.png){.one-third}![](media/account_creation_2.png){.one-third}![](media/account_creation_3.png){.one-third} 
+
+::: notes
+
+To get started in Google Cloud Platform (GCP), you need a **Google identity** (e.g. a gmail account) that hasn't already signed up for GCP.
+
+If you need to create a new Google identity, please go to https://accounts.google.com now and create a new account.  The images on this slide give you an idea of what this might look like.
+
+You will probably want to open an incognito window if you don't want to use your current identity.
+
+You'll be asked to provide your rationale for this identity (I choose 'my personal use').  Then you'll be asked to provide a first name, and Google will suggest a couple of usually terrible account options.  Here, you can see I've created a one-off identity just for this week. 
+
+Then you'll be asked more questions about your age and identifiers. Feel free to fudge these if you want to preserve anonymity.  You probably want to add a mobile phone or secondary email address to prevent locking yourself out. Finally, accept the terms of use and you'll have your new identity!  
+
+
+:::
+
+
+## Getting Started in GCP {.smaller}
+
+Have your Google identity? Now you can go to https://console.cloud.google.com to sign up for GCP.
+
+You have to do two things:
+
+1. Agree to terms and 
+2. Activate your free trial
+  - Agree to THOSE terms
+  - Set up a new "payments profile" and add a credit card number
+
+::: notes
+
+To start with Google Cloud Platform, there are two things you need to do:
+
+First, you need to agree with the terms of GCP, and then you need to activate your free trial, which itself has two steps.  We're going to go through this together in the next couple of slides.
+
+:::
+
+## Getting Started in GCP {.smaller}
+
+::: {.columns .v-center-container}
+::: {.column width="20%"}
+First, agree to terms (the easy part).
+
+Check the box and click "Agree..."
+:::
+
+::: {.column width="80%"}
+![](media/gcp_step_1.png)
+:::
+:::
+
+::: notes 
+
+To agree to the GCP general terms, you just click the checkbox.
+
+:::
+
+## Getting Started in GCP {.smaller}
+
+
+Now, start the free trial: a bit more complex.
+
+![](media/gcp_step_2a.png){.one-half}![](media/gcp_step_2b.png){.one-half}
+
+
+```{r echo=FALSE}
+countdown(minutes = 5, seconds = 00)
+```
+
+::: notes 
+
+After you click to agree to terms, you can activate your free trial.
+
+You will have to enter a credit card number. 
+
+Google will not charge you unless you decide to change your account status to a "paid" account. If you don't add a credit card, it's possible that you may be able to use a "sandbox" account -- I'm not certain. However, it's highly likely that you won't be able to do everything we're doing today in the course.
+
+They'll then ask you a few questions about how you plan to use GCP, and you can answer those however you want.
+
+We'll wait here for around 5 minutes for everyone to catch up, and I'm available in the chat for questions.
+:::
+
+## Google Cloud Platform Toolbar
+
+![](media/gcp_toolbar.png) 
+
+::: notes
+
+Now is great time to take a look at your Google cloud platform console toolbar. As a reminder, you login to Google cloud platform by going to https://console.cloud.google.com. I'm going to draw your attention to a few things here.
+
+On the far left is the burger menu, which you can use to access GCP resources like storage, compute, and network services.
+
+Next to it, the Google Cloud logo will take you to your project dashboard.
+
+Then there's a project selector, which you can click on to expand.  It also shows the currently selected project.
+
+In the middle there's a search bar I didn't bother labeling.
+
+To the right of the search bar, you have a few small icons.  First, Gemini, which is a helper chatbot to help you answer questions you might have about GCP.
+
+Then there's the Cloud Shell logo, which looks like a command prompt, because it takes you to the bash shell of a small VM that is spun up for free with each project which allows you to use Google APIs in the console.
+
+Next to that, you might have a bell, or a number.  This icon is for notifications or messages that you might want to read.
+
+Then there's a help button, followed by a kebab menu that has additional menu items, which have more to do with GCP settings overall, like the terms of service or billing.
+
+And finally, and importantly, the account.  If you're like me and have several Google identities, one of which is work, it's important to check to make sure you are who you think you are.  In this example, I hovered over the icon so that the identity would show up and I could make sure I was in the right account.
+
+Questions, snags, issues? Were you able to create an identity (or use your current identity) and sign up for Google Cloud Platform?
+
+Are you now able to log in to Google Cloud Platform using the username and password of your Google identity?
+
+:::
+
+## GCP Data Solutions: BigQuery
+
+-   BigQuery is not just "giant SQL": it's for warehousing
+-   It is not intended for production transactional work:
+-   No foreign keys
+-   Column based storage means inefficient lookups of single rows
+-   Transactional consistency not guaranteed
+-   BigQuery has its own SQL dialect (Mostly what you're used to)
+
+::: notes
+
+BigQuery is not built to support online transaction processing.
+
+BigQuery is not simply your ordinary postGREs or mySQL database scaled up to a giant size.
+
+No, it actually has architectural differences that make it optimized for big data and for data analysis in particular.
+
+For instance, it's based on columns, not rows. If you think about online transaction processing, it's often row based: Started at a's might have to be updated to reflect a particular order being shipped or an address change for single customer. a row forAnd analytics based workflow. Additionally I think it's important to point out that big query has its own SQL dialects, standard SQL. It's mostly what you're used to, although there're a few caveats, and as I do live queries, you might catch me making a mistake because of my many years of using MySQL or Maria DB. Luckily all SQL dialects are fairly similar to each other and big query has lots of online documentation to help you figure out how to do what you're accustomed to doing.
+
+:::
+
+## Get Started With BigQuery!
+
+To get started with BigQuery, you will:
+
+-   Create a new project
+-   Project name -- mutable, you assign
+-   Project ID -- immutable, you assign
+-   Project number -- immutable, Google assigns
+-   Add BigQuery as a resource
+-   Use datasets you create and/or public datasets you can access
+
+Optionally, add other resources:
+
+-   Google Cloud Storage to hold large files for ingestion by BigQuery
+-   Containers or VMs with analytic software like R / Stata
+-   Service accounts to interface with BigQuery
+
+::: notes
+
+When we create a project, we assign a project name and project ID. Google will assign a project number. What's the project is created, we have to add any resources we want, whether that's computational resources like IBM, data resources like a query, or other Google cloud platform products and services.
+
+:::
+
+## Getting Started in GCP
+
+Google Cloud Platform (GCP) organizes resources by project.
+
+Optionally, you can also define an organization and group projects by folder.
+
+16 Image url: https://cloud.google.com/blog/products/identity-security/get-more-control-over-your-compute-engine-resources-with-new-cloud-iam-features
+
+::: notes
+
+To get started using BigQuery, you need to understand a little bit about how Google cloud platform as a whole organizes resources. Google cloud platform organizes resources by project. If you're accustomed to using, say, AWS, this is somewhat different. A project can potentially be nested under in folder and or an organization.
+
+:::
+
+## Exercise (Together)
+
+-   Create a new project with a name and ID that work for you
+-   Open BigQuery
+-   Preview public datasets
+
+## Create A New Project
+
+-   In the project selector, click downwards facing triangle
+-   Select "New Project"
+-   Add a project name, edit the project ID (optional)
+-   Project ID must be globally unique!
+-   Leave "Location" as "No Organization"
+-   Click "Create"
+
+## Open BigQuery
+
+-   Once you're in your project, click the "burger" menu (☰).
+-   BigQuery is probably already pinned. If not:
+-   Scroll past the "Databases" section
+-   Once you get to "Analytics", click on BigQuery (you may also want to "pin" this to the top of your menu).
+
+## Preview Public Datasets
+
+-   In Explorer, click on " + Add Data" , then search for "public data" to select Google's public datasets. Search for "New York" in the new "Marketplace" window, then choose NYC 311. Choose "View Dataset". A new tab may open. In your Explorer view, all of bigquery-public-data should appear as "pinned".

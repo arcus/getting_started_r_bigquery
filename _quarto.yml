@@ -1,0 +1,9 @@
+project:
+  type: website
+  render:
+    - "*.qmd"
+
+embed-resources: true
+execute:
+  echo: true
+  freeze: auto
