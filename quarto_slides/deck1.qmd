@@ -16,11 +16,18 @@ Please use a computer and network that will allow you to use Google products (gm
 If you don't already have a **personal (not work)** Google Cloud Platform account, you will set one up in the first section of today's course. You will need:
 
 * a mobile phone number and 
-* a credit card, but **will not be charged.** 
+* a credit card, but **will not be charged** 
 
 If you're an established GCP user, you might be past your "free tier" usage this month and may accrue a small charge for today's work, but it's unlikely.
 
+```{r echo = FALSE}
+library(countdown)
+countdown(minutes = 5, seconds = 00)
+```
+
 ::: notes
+
+Hi all, please read this slide as we get prepared to start today.  I want to give folks a chance to change over to a personal computer or grab a credit card.  We'll get started in about 5 minutes.
 
 Hi everyone, welcome to today's course on First Steps with Google BigQuery. A few notes before we get started. If you are using a work computer or a work network, like a VPN, you are likely to encounter some difficulties with today's activities. I know in our healthcare environments, there are often some restrictions placed on Google services and websites. So, now might be a good time to log off the VPN or fire up your personal laptop. I promise you will be able to catch up and now is a good time to switch computers.
 
@@ -37,10 +44,6 @@ This slide deck was built in Quarto!
     -   go back ( ← )
 -   Type "s" to see speaker notes
 -   Type "?" to see other keyboard shortcuts
-
-```{r echo = FALSE}
-library(countdown)
-```
 
 ::: notes
 
@@ -135,7 +138,7 @@ Then you'll be asked more questions about your age and identifiers. Feel free to
 
 ## Getting Started in GCP {.smaller}
 
-Have your Google identity? Now you can go to https://console.cloud.google.com to sign up for GCP.
+Have your Google identity? Now you can go to [https://console.cloud.google.com](https://console.cloud.google.com) to sign up for GCP.
 
 You have to do two things:
 
@@ -233,10 +236,10 @@ Are you now able to log in to Google Cloud Platform using the username and passw
 
 -   BigQuery is not just "giant SQL": it's for warehousing
 -   It is not intended for production transactional work:
--   No foreign keys
--   Column based storage means inefficient lookups of single rows
--   Transactional consistency not guaranteed
--   BigQuery has its own SQL dialect (Mostly what you're used to)
+  -   No foreign keys
+  -   Column based storage means inefficient lookups of single rows
+  -   Transactional consistency not guaranteed
+  -   BigQuery has its own SQL dialect (Mostly what you're used to)
 
 ::: notes
 
@@ -246,7 +249,9 @@ BigQuery is not simply your ordinary postGREs or mySQL database scaled up to a g
 
 No, it actually has architectural differences that make it optimized for big data and for data analysis in particular.
 
-For instance, it's based on columns, not rows. If you think about online transaction processing, it's often row based: Started at a's might have to be updated to reflect a particular order being shipped or an address change for single customer. a row forAnd analytics based workflow. Additionally I think it's important to point out that big query has its own SQL dialects, standard SQL. It's mostly what you're used to, although there're a few caveats, and as I do live queries, you might catch me making a mistake because of my many years of using MySQL or Maria DB. Luckily all SQL dialects are fairly similar to each other and big query has lots of online documentation to help you figure out how to do what you're accustomed to doing.
+For instance, it's based on columns, not rows. If you think about online transaction processing, it's often row based: Some rows might have to be updated to reflect a particular order being shipped or an address change for single customer. 
+
+We see different patterns when we're doing an analytics based workflow. Additionally I think it's important to point out that BigQuery has its own SQL dialects, standard SQL. It's mostly what you're used to, although there are a few caveats, and as I do live queries, you might catch me making a mistake because of my many years of using MySQL or Maria DB. Luckily all SQL dialects are fairly similar to each other and BigQuery has lots of online documentation to help you figure out how to do what you're accustomed to doing.
 
 :::
 
@@ -269,7 +274,7 @@ Optionally, add other resources:
 
 ::: notes
 
-When we create a project, we assign a project name and project ID. Google will assign a project number. What's the project is created, we have to add any resources we want, whether that's computational resources like IBM, data resources like a query, or other Google cloud platform products and services.
+When we create a project, we assign a project name and project ID. Google will assign a project number. What's the project is created, we have to add any resources we want, whether that's computational resources like a VM or Kubernetes cluster, data resources like BigQuery, or other Google Cloud Platform products and services.
 
 :::
 
@@ -279,7 +284,7 @@ Google Cloud Platform (GCP) organizes resources by project.
 
 Optionally, you can also define an organization and group projects by folder.
 
-16 Image url: https://cloud.google.com/blog/products/identity-security/get-more-control-over-your-compute-engine-resources-with-new-cloud-iam-features
+![](media/gcp_resource_organization.png)
 
 ::: notes
 
@@ -293,14 +298,38 @@ To get started using BigQuery, you need to understand a little bit about how Goo
 -   Open BigQuery
 -   Preview public datasets
 
+
+::: notes
+
+OK, so let's get you started actually using Google Cloud Platform.  We'll do these three things together, and this is a chance for you to get some hands-on practice.  
+
+We'll start by creating a new project with a name and ID that work for you.  We'll then find BigQuery, and pin it so that it's conveniently located for our use in the menu.  And we'll take a look at some public datasets, so you can get your hands on some big data to play with.
+
+:::
+
 ## Create A New Project
 
 -   In the project selector, click downwards facing triangle
 -   Select "New Project"
 -   Add a project name, edit the project ID (optional)
 -   Project ID must be globally unique!
+![](media/unique_project_id.png)
 -   Leave "Location" as "No Organization"
 -   Click "Create"
+
+
+::: notes
+
+OK, so let's get started.  In the project selector, click the downwards facing triangle and select "New Project".  Name your project something that will remind you of what it is.  You can call it whatever you want.  You can also edit the project ID to match the project name more closely, BUT... the project ID has to be globally unique, so that it's the only project in all of GCP around the world with that ID.  That means you definitely won't get my dash first dash project as a project ID, because that's certainly taken.  You can append a random number to the end if you want.  Just don't name it something embarrassing, because you can't change the ID once it's minted.
+
+So let's do this together!
+
+First, I'm going to click on the project selector, and create a new project.  I'll call this rmed-2024, and I'll change the id to be similar to that, because I don't like the pre-suggested ID Google offers.  I'll need to add some text that will be likely to make this unique.  So I could put in some numbers, or a word or two.
+
+This ID is globally unique so I'm going to go with that.  I'll leave "Organization" as "no organization" and click "Create" to make the project.  
+
+
+:::
 
 ## Open BigQuery
 
@@ -308,7 +337,21 @@ To get started using BigQuery, you need to understand a little bit about how Goo
 -   BigQuery is probably already pinned. If not:
 -   Scroll past the "Databases" section
 -   Once you get to "Analytics", click on BigQuery (you may also want to "pin" this to the top of your menu).
+-   Enable the BigQuery API to add BigQuery to your project
+
+::: notes
+
+OK, so now one of the things we want to do is ensure that our project includes BigQuery.  We can do that by making sure our project is the one selected in the project selector.  
+
+I'll look up in the navigation bar to find the current project, which is indeed the project I want to be in.  
+
+:::
 
 ## Preview Public Datasets
 
 -   In Explorer, click on " + Add Data" , then search for "public data" to select Google's public datasets. Search for "New York" in the new "Marketplace" window, then choose NYC 311. Choose "View Dataset". A new tab may open. In your Explorer view, all of bigquery-public-data should appear as "pinned".
+
+::: notes
+
+
+:::
