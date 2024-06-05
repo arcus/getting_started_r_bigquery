@@ -1,10 +1,15 @@
 ---
-title: "SQL in BigQuery"
-format: revealjs
+title: "Getting Started: R and BigQuery"
+format: 
+  revealjs:
+    theme: [serif, custom.scss]
+    scrollable: true
+    footer: Joy Payton, Children's Hospital of Philadelphia
+    css: styles.css
 editor: visual
 ---
 
----
+------------------------------------------------------------------------
 
 This slide deck was built in Quarto!
 
@@ -18,132 +23,149 @@ This slide deck was built in Quarto!
 library(countdown)
 ```
 
+# SQL Refresher {.smaller}
 
-SQL Refresher and SQL in BigQuery
-SELECT +  FROM  +  WHERE;
+This is the pattern we'll come back to again and again in SQL (Structured Query Language):
 
-SELECT 
-  cabin, high_score 
-FROM
-  camp_kickball_tournament
-WHERE 
-  high_score < 10;
+`SELECT + FROM + WHERE;`
 
-Main pattern we go back to over and over…
+| cabin | high_score | wins | losses |
+|--|--|---|---|
+| Yellow | 10 |3 |0|
+|Blue |7 |2 |1 |
+|Orange |9 |1| 2|
+
+For example: `SELECT cabin, high_score FROM camp_kickball_tournament WHERE high_score < 10`
 
 
-cabin
-high_score
-wins
-losses
-Yellow
-10
-3
-0
-Blue
-7
-2
-1
-Orange
-9
-1
-2
-camp_kickball_tournament
-22
-SQL, or Structured Query Language, is used to get information from a database that stores data in tables.  Tables have rows, which are individual records, and columns, which are the values that are included in a record.  Consider, for example, this pretend table called camp_kickball_tournament.  
+::: notes 
 
-Aliases (AS)
-SELECT +  FROM  +  WHERE;
+SQL, or Structured Query Language, is used to get information from a database that stores data in tables. Tables have rows, which are individual records, and columns, which are the values that are included in a record. 
+
+We use a common pattern in SQL: SELECT plus some column names, FROM plus a table name, and WHERE plus some row conditions.
+
+Consider, for example, this pretend table called camp_kickball_tournament.  If we wanted to extract just some data from this table, we could use the SELECT statement to indicate which columns, and the WHERE statement to indicate a filter to help determine which rows matched.  The FROM gives us the table name to look in.
+:::
+
+# Aliases (AS) 
+
+Aliases allow you to (re)name things:
+
+```
 SELECT 
   cabin, 
-  high_score,
-  wins/(wins + losses) AS prop_win
-FROM
-  camp_kickball_tournament
-WHERE 
-  high_score < 10;
+  high_score, 
+  wins/(wins + losses) AS prop_win   
+FROM camp_kickball_tournament 
+WHERE high_score < 10;
+```
 
-Main pattern we go back to over and over…
+::: notes
+
+You can use aliases to make things easier to read, by creating shortened names for things, renaming things that don't already have intuitive names, or calculating computed data and naming that data.
+
+:::
+
+# Whitespace / Capitalization {.smaller}
+
+Which is easier to read?
 
 
-23
-cabin
-high_score
-wins
-losses
-Yellow
-10
-3
-0
-Blue
-7
-2
-1
-Orange
-9
-1
-2
-camp_kickball_tournament
-
-Whitespace / Capitalization
+::: {.columns .v-center-container}
+::: {.column width="40%"}
+```
 SELECT 
   cabin, 
-  high_score,
-  wins/(wins + losses) AS prop_win
-FROM
-  camp_kickball_tournament
-WHERE 
-  high_score < 10;
+  high_score, 
+  wins/(wins + losses) AS prop_win 
+FROM camp_kickball_tournament 
+WHERE high_score < 10;
+```
+:::
+::: {.column width="60%"}
 
+```
 select cabin,high_score,wins/(wins + losses) as prop_win from camp_kickball_tournament where high_score < 10;
+```
+:::
+:::
 
-Both are valid, but one will make future-you happier.
+* Be consistent (reduce cognitive load on teammates / future you) 
+* Capitalize key words so they stand out 
+* Indent the parts of your query 
+* Consider using a new line for every field
+
+::: notes 
+Both of these are valid SQL syntax and do the same thing, but one will make future-you happier.
 
 Lots of digital ink has been spilled on the "right" way to structure SQL queries but it boils down to:
 
-Be consistent (reduce cognitive load on teammates / future you)
-Capitalize key words so they stand out
-Indent the parts of your query
-Consider using a new line for every field
+* Be consistent (reduce cognitive load on teammates / future you) 
+* Capitalize key words so they stand out 
+* Indent the parts of your query 
+* Consider using a new line for every field
 
-24
-:40
+:::
 
-Itinerary for first section
-Getting Started in GCP
-BigQuery
-SQL Refresher
-Break
+# Query Button {.smaller}
 
-01
-25
+Use the "Query" button (or the one with the magnifying glass) when you're looking within a table to avoid annoying syntax issues like having to type fully qualified table names (`project.dataset.table`).
+
+![](media/query_button.png){.bordered .one-third}
+
+::: notes
+BigQuery requires fully qualified table names, where you include the project name, the dataset name, and the table name, all separated by periods and enclosed in backticks (not the same as single quotes).  This can be challenging to learn and hard to type correctly.
+
+Skip the headache by starting with the "Query" button with the magnifying glass.  If you're zoomed in or there's not much screen real estate, this button might appear with only the magnifying glass.  This button is available when you're looking at the details of a particular table, and it will give you the start of a query with the table name included!
+
+:::
+
+# Queries in BigQuery  {.smaller}
+
+Once you click "Query Table" (and then "New Tab" or whatever you prefer), you'll see a partial query, with the cursor located so that you can add fields after SELECT.
+
+![](media/boilerplate_query.png){.bordered}
+
+You'll also see warnings that your query is invalid.  That's expected!
+
+::: notes
+When you start a new query this way, you'll be given the start of a query with the table name included, and your cursor in the SELECT statement, where you could just type in a field name or two or three, separated by commas.
+
+You'll also see red warnings that your query is invalid.  That's expected, because your query is in fact incomplete... you haven't indicated which fields you want in your SELECT statement.  You can hover over the error to get an explanation.
+:::
+
+# Your First Query {.smaller}
+
+::: {.columns .v-center-container}
+::: {.column width="60%"}
+* You might have to adjust your pane widths to see all the buttons you need.
+* Please click on the table in the CDC data (`sdoh_cdc_wonder_natality`) called `county_natality`. * Click on the "query" button and choose "In split tab".
+* Add one or more fields from the schema of the table between the words "SELECT" and "FROM" in the query.
+* When you get a green check mark showing that your query is valid, click the blue "Run" button above your query.
+:::
+::: {.column width="40%"}
+![](media/first_query){.bordered}
+:::
+:::
+
+```{r echo = FALSE}
+library(countdown)
+countdown(minutes = 3, seconds = 00)
+```
 
 
+::: notes
+OK, so you're going to issue the first SQL query in the workshop today.  Note that you might have to adjust your pane widths to see all the buttons you need.
 
-Arrive
-01
-Getting started with Google Cloud Platform and BigQuery
-Query
-02
-Practice SQL queries and gain experience using BigQuery 
-Integrate
-03
-Use Colab notebooks to work with your data outside of BigQuery
-Visualize
-04
-Use Folium to create maps of geographic data
-Our Itinerary
-26
+I'd like for you to look in your starred datasets, and  click on the table in the CDC data called `county_natality`.
 
-Itinerary for second section
-Your first BigQuery query
-Save your work
-Grouping and aggregation
-JOINs
-Break
+Then, click on the query button, which will have a magnifying glass, and choose "new tab."  That will allow you to see the Schema and the Query on the same screen.
 
-02
-27
-First hour today we'll begin by getting you set up to use Google Cloud Platform and get you started in BigQuery.  We'll go over a bit of SQL to refresh your memory or give you some basics, and then I will show how you can save your interim data sets as well as your queries and materialized views.  We'll end with a break.
+Using what you know from the Schema, add one or more field names that are valid for this table in the SQL query, right after the word SELECT.
+
+When you get a green check mark showing that your query is valid, click the blue "Run" button above your query.
+
+I'll give everyone 3 minutes for this.
 
 
+:::
