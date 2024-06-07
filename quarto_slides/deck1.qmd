@@ -1,5 +1,5 @@
 ---
-title: "Getting Started: R and BigQuery"
+title: "Getting Started: R and Google BigQuery"
 format: 
   revealjs:
     theme: [serif, custom.scss]
@@ -18,7 +18,7 @@ Please use a computer and network that will allow you to use Google products (gm
 If you don't already have a **personal (not work)** Google Cloud Platform account, you will set one up in the first section of today's course. You will need:
 
 -   a mobile phone number and
--   a credit card, but **will not be charged**
+-   a credit card, but **will not be charged** (I PROMISE)
 
 If you're an established GCP user, you might be past your "free tier" usage this month and may accrue a small charge for today's work, but it's unlikely.
 :::
@@ -39,6 +39,20 @@ Hi everyone, welcome to today's course on First Steps with Google BigQuery. A fe
 
 Additionally, I suggest that you use a personal Google Cloud Platform account, **even if you already have a work account**. If you're using a work GCP account, you might not have all of the permissions granted to you that you will need to complete today's tasks. We will take some time out at the beginning of this workshop to allow you to set up a new personal Google Cloud Platform account, if needed.
 :::
+
+# BigQuery, According to Google
+
+"BigQuery is a fully managed enterprise data warehouse that helps you manage and analyze your data with built-in features like machine learning, geospatial analysis, and business intelligence. BigQuery's serverless architecture lets you use SQL queries to answer your organization's biggest questions with zero infrastructure management."
+
+::: notes
+
+OK, so is this the right workshop for you?  Your time is not a renewable resource and it will NOT hurt my feelings if you realize this is not the best use of it.  Is this what you're interested in learning about?  
+
+Today I'll be focusing mostly on BigQuery, with only a little bit of R.  And what is BigQuery?  BigQuery is Google Cloud's fully managed, petabyte-scale, and cost-effective analytics data warehouse that lets you run analytics over vast amounts of data.  Today, we'll talk about cloud computing, BigQuery in particular, how to work with SQL queries, and finally how to integrate that work into R.  Questions now about our scope and what will be covered?
+
+:::
+
+
 
 ------------------------------------------------------------------------
 
@@ -65,9 +79,9 @@ Data Scientist / Data Educator
 I have no conflicts of interest to report.
 
 ::: notes
-So I haven't properly introduced myself yet, so let's do that! My name is Joy Payton and I use she/her pronouns. My primary job is as a teaching data scientist at the Children's Hospital of Philadelphia, the Nation's first hospital for children, where I teach investigators how to use tools like R, Python, SQL, the Linux command line, version control with Git, and other topics. You can reach me by contacting me on LinkedIn, and I love networking with peers and learners, so don't be shy about reaching out. I have no conflicts of interest to report, but I am in fact actively interested in developing conflicts of interest, so feel free to reach out to me!
+So I haven't properly introduced myself yet, so let's do that! My name is Joy Payton and I use she/her pronouns. My primary job is as a teaching data scientist at the Children's Hospital of Philadelphia, the Nation's first hospital for children, where I teach investigators how to use tools like R, Python, SQL, the Linux command line, version control with Git, and other topics. You can reach me by contacting me on LinkedIn, and I love networking with peers and learners, so don't be shy about reaching out. I have no conflicts of interest to report.  I don't work for Google, the R Consortium, or Posit, and will not have any personal gain from talking about Google, R, or Posit today. That said, I am in fact actively interested in developing conflicts of interest, so if you have one, plesae feel free to reach out to me!
 
-Finally, I like to say that I know a little about a lot, and I teach a broad range of skills. If you know a better way to do something than what I share, please let me know! Drop your tips and tricks into chat. I try not to have a thin skin around stuff like that.
+Finally, I like to say that I know a little about a lot, and I teach a broad range of skills. I am more of a generalist than a specialist, so I often teach in rooms to people who know more than me.  If you know a better way to do something than what I share, please let us know! Drop your tips and tricks into chat. I try not to have a thin skin around stuff like that.
 :::
 
 # Materials for Today
@@ -90,7 +104,7 @@ Finally, feedback is incredibly important to me, because it's how I can improve 
 
 **Hour 1**: GCP and BigQuery Orientation
 
-**Hour 2**: SQL in BigQuery, R Tools
+**Hour 2**: BigQuery Data, SQL in BigQuery, R Tools 
 
 **Hour 3**: R/RStudio and BigQuery Integration
 
@@ -99,7 +113,7 @@ We have a three hour course today, and we'll give time for breaks along the way.
 
 Our first hour, we're concentrating just on arriving – arriving to Google Cloud Platform and BigQuery. We'll start to dip our toes into GCP and understand a little bit more about BigQuery.
 
-Then, after a break, we'll go into the second hour, which concentrates on querying in SQL. If you have experience in SQL that's great, because we're going to move into intermediate-to-advanced SQL. If this is your first time, you may find some of this material challenging, but you're going to be leaving with access to all the SQL code we're working with, and can continue to review it after you finish the course. We'll also talk about R tools in GCP.
+Then, after a break, we'll go into the second hour, which concentrates on using BigQuery. If you have experience in SQL that's great, because we're going to move into intermediate-to-advanced SQL. If this is your first time, you may find some of this material challenging, but you're going to be leaving with access to all the SQL code we're working with, and can continue to review it after you finish the course. We'll also talk about R tools in GCP.
 
 In our third hour, we'll work on integrating our tools into R.
 :::
@@ -110,25 +124,63 @@ In our third hour, we'll work on integrating our tools into R.
 -   Creating a new Project
 -   Enabling BigQuery
 -   Adding Data
--   Exploring Data
 
 ::: notes
 First hour today we'll begin by getting you set up to use Google Cloud Platform and get you started in BigQuery. We'll load up some large-ish public datasets, and then we'll explore the data.
 :::
 
-# Getting Started in GCP
+# What is GCP? {.smaller}
+
+::: {.columns .v-center-container}
+::: {.column width="50%"}
+
+GCP, or Google Cloud Platform, is a public cloud provider.
+
+It's similar to other offerings you may have heard of, like AWS or Azure.
+
+Cloud providers are increasingly important in medicine!
+
+:::
+::: {.column width="50%"}
+![](media/gcp_ad.png){.bordered}
+:::
+:::
+
+::: notes
+
+We're not going to do a "Cloud 101" here to go over what GCP or AWS are writ large. But as a very short approximation, we can say that public cloud providers are big companies like Google (who sells services as part of Google Cloud Platform) and Amazon (who sells services as part of Amazon Web Services), and these big companies rent out computational resources. That could be things like computing systems such as virtual machines (VMs) or containers, or data systems like a SQL or graph database, or access to large models like generative AI systems, or storage such as object storage or persistent disks, or networking solutions like dedicated IP addresses and secure networks that keep certain systems segregated from one another or safe from the public internet.
+
+Why is this important to you today at R/Medicine?  Well, medical computation is increasingly large and complex, and most of us work at hospitals or other businesses or non profits, where our prime purpose is clinical care or research.  Our motivation for existing is NOT to run a data center, but many of our institutions used to HAVE to do that in the past, because there was no alternative.  But now, there are high-quality, well-run, top of the line cloud providers that are experts in their field, just as you are in yours.  Many medical systems are deciding that some of their resources are better spent paying these experts to run part of their major infrastructure, software, networking, or data storage, instead of trying to recruit and retain talent, build or rent major computational infrastructure, and so on.
+
+I won't get into the dollars and cents of how leaders make the decision to use cloud, or not, but know that this is happening all over medicine, and knowing what cloud is, and how to use it, can help you.  In today's talk, we're going to use Google, but Amazon, Azure, and other major cloud providers all have similar products that might look a little different but function mostly the same.
+:::
+
+# Already a GCP User? {.smaller}
 
 If you already have a GCP account that you'll be using for this workshop
 
-**Option A:** go get a cup of coffee and we'll see you back here in about 10 minutes. You might end up spending money on our activities today!
+**Option A:** go get a cup of coffee and we'll see you back here in about 15 minutes. You might end up spending money on our activities today!
 
-**Option B:** stick around to create a new account with a brand new "welcome to GCP" free trial worth \$300 in GCP services
+**Option B (recommended):** stick around to create a new account with a brand new "welcome to GCP" free trial worth \$300 in GCP services
 
-# Getting Started in GCP {.smaller}
+# Google Identity {.smaller}
 
+::: {.columns .v-center-container}
+::: {.column width="80%"}
 If you need to create a new Google identity, please go to <https://accounts.google.com> now and create a new account. Even if you already have one, this is a way to guarantee you'll be working in the free tier with some Google credits!
 
 ![](media/account_creation_1.png){.one-third}![](media/account_creation_2.png){.one-third}![](media/account_creation_3.png){.one-third}
+
+::: 
+::: {.column width="20%"}
+
+:::
+:::
+
+```{r echo=FALSE}
+countdown(minutes = 5, seconds = 00)
+```
+
 
 ::: notes
 To get started in Google Cloud Platform (GCP), you need a **Google identity** (e.g. a gmail account) that hasn't already signed up for GCP.
@@ -140,9 +192,11 @@ You will probably want to open an incognito window if you don't want to use your
 You'll be asked to provide your rationale for this identity (I choose 'my personal use'). Then you'll be asked to provide a first name, and Google will suggest a couple of usually terrible account options. Here, you can see I've created a one-off identity just for this week.
 
 Then you'll be asked more questions about your age and identifiers. Feel free to fudge these if you want to preserve anonymity. You probably want to add a mobile phone or secondary email address to prevent locking yourself out. Finally, accept the terms of use and you'll have your new identity!
+
+I'm going to give us a couple of minutes to do this step.
 :::
 
-# Getting Started in GCP {.smaller}
+# Setting Up GCP {.smaller}
 
 Have your Google identity? Now you can go to <https://console.cloud.google.com> to sign up for GCP.
 
@@ -157,10 +211,10 @@ You have to do two things:
 ::: notes
 To start with Google Cloud Platform, you can go to <https://console.cloud.google.com> to sign up, and there are two things you need to do:
 
-First, you need to agree with the terms of GCP, and then you need to activate your free trial, which itself has two steps. We're going to go through this together in the next couple of slides.
+First, you need to agree with the terms of GCP, and then you need to activate your free trial, which itself has two steps. We're going to go through this in the next couple of slides.  Please, if you're struggling, reach out, because I'd rather us pause here and get everyone caught up, rather than leave anyone behind.
 :::
 
-# Getting Started in GCP {.smaller}
+## Agreeing to terms {.smaller}
 
 ::: {.columns .v-center-container}
 ::: {.column width="20%"}
@@ -178,7 +232,7 @@ Check the box and click "Agree..."
 To agree to the GCP general terms, you just click the checkbox.
 :::
 
-# Getting Started in GCP {.smaller}
+## Free Trial {.smaller}
 
 Now, start the free trial: a bit more complex.
 
@@ -205,6 +259,11 @@ We'll wait here for around 5 minutes for everyone to catch up, and I'm available
 ![](media/gcp_toolbar.png)
 
 ::: notes
+
+You should be at about :30.
+
+OK, so hopefully everyone is back, and if you went to get a cup of coffee because you're using your own GCP account, you've come back.  And if you are brand new, you've created a Google identity and used that to sign up for GCP and a free trial of $300 worth of credits.
+
 Now is great time to take a look at your Google cloud platform console toolbar. As a reminder, you login to Google cloud platform by going to https://console.cloud.google.com. I'm going to draw your attention to a few things here.
 
 On the far left is the burger menu, which you can use to access GCP resources like storage, compute, and network services.
@@ -217,7 +276,7 @@ In the middle there's a search bar I didn't bother labeling.
 
 To the right of the search bar, you have a few small icons. First, Gemini, which is a helper chatbot to help you answer questions you might have about GCP.
 
-Then there's the Cloud Shell logo, which looks like a command prompt, because it takes you to the bash shell of a small VM that is spun up for free with each project which allows you to use Google APIs in the console.
+Then there's the Cloud Shell logo, which looks like a command prompt, because it takes you to the bash shell of a small VM that is spun up for free with each project which allows you to use Google Command Line tools in the console.
 
 Next to that, you might have a bell, or a number. This icon is for notifications or messages that you might want to read.
 
@@ -230,19 +289,61 @@ Questions, snags, issues? Were you able to create an identity (or use your curre
 Are you now able to log in to Google Cloud Platform using the username and password of your Google identity?
 :::
 
+# Gemini: Generative AI {.smaller}
+
+::: {.columns .v-center-container}
+::: {.column width="50%"}
+
+Let's experiment.  Click on the Gemini "star" and ask a question about BigQuery or GCP.  I thought it might be interesting to ask about BigQuery and medicine.
+
+:::
+::: {.column width="50%"}
+![](media/gemini.png){.bordered}
+::: 
+::: 
+
+::: notes
+
+Let's experiment.  Click on the Gemini four-pointed "star" in your toolbar and type in a question about BigQuery or GCP.  I thought it might be interesting to ask about BigQuery and medicine. Try asking a question you have, like "what is BigQuery" or "how do hospitals use GCP" or something similar!
+
+Keep in mind that this is generative AI, and while some of what it says might be true, other bits need a bit of skepticism.    
+
+:::
+
+# Gen AI Caveats
+
+::: {.columns .v-center-container}
+::: {.column width="50%"}
+
+![](media/gemini_false.png){.bordered}
+:::
+::: {.column width="50%"}
+![](media/gemini_true.png){.bordered}
+::: 
+::: 
+
+::: notes
+
+For example, I asked Gemini within my GCP console for tips on how to save money in BigQuery.  One of its tips said to use LIMIT to reduce cost, but that's not actually true.  Because LIMIT is applied **after** all data is read, it reduces the number of rows given back to you, but not the cost of the computation to bring in all the data, and that's what you're charged on.  
+
+Ironically, Gemini itself explains this well in a different context, that of the Google search engine results.
+
+That being said, you can use Generative AI using Gemini to help you understand GCP offerings and also write SQL queries in BigQuery... but exercise some skepticism when it comes to taking what Gemini gives you at face value.  
+:::
+
 # GCP Data Solutions: BigQuery {.smaller}
 
 -   BigQuery is not just "giant SQL": it's for warehousing
 -   It is not intended for production transactional work:
--   No foreign keys
--   Column based storage means inefficient lookups of single rows
+  -   No foreign keys
+  -   Column based storage means inefficient lookups of single rows
 -   Transactional consistency not guaranteed
 -   BigQuery has its own SQL dialect (Mostly what you're used to)
 
 ::: notes
-We're not going to do a "Cloud 101" here to go over what GCP or AWS are writ large. But as a very short approximation, we can say that public cloud providers are big companies like Google (who sells services as part of Google Cloud Platform) and Amazon (who sells services as part of Amazon Web Services), and these big companies rent out computational resources. That could be things like computing systems such as virtual machines (VMs) or containers, or data systems like a SQL or graph database, or storage such as object storage or persistent disks, or networking solutions like dedicated IP addresses and secure networks that keep certain systems segregated from one another or safe from the public internet.
 
-What we will talk about today is one of Google Cloud Platform's major data resources, the SQL data warehouse known as BigQuery.
+
+Let's move to the GCP technology we're going to mostly talk about today: one of Google Cloud Platform's major data resources, the SQL data warehouse known as BigQuery.
 
 BigQuery is not built to support online transaction processing. It is not simply your ordinary postGREs or mySQL database scaled up to a giant size.
 
@@ -252,7 +353,7 @@ For instance, storage in BigQuery is based on columns, not rows. If you think ab
 
 We see different patterns when we're doing an analytics based workflow, where I might want to look at trends in a particular field or column, like a patient's birth weight or a customer's total billed amount.
 
-Additionally I think it's important to point out that BigQuery has its own SQL dialects, standard SQL. It's mostly what you're used to, although there are a few caveats, and as I do live queries, you might catch me making a mistake because of my many years of using MySQL or Maria DB. Luckily all SQL dialects are fairly similar to each other and BigQuery has lots of online documentation to help you figure out how to do what you're accustomed to doing.
+Additionally I think it's important to point out that BigQuery has its own SQL dialect, standard SQL. It's mostly what you're used to, although there are a few caveats, and as I do live queries, you might catch me making a mistake because of my many years of using MySQL or Maria DB. Luckily all SQL dialects are fairly similar to each other and BigQuery has lots of online documentation to help you figure out how to do what you're accustomed to doing.
 :::
 
 # Getting Started in GCP
@@ -285,7 +386,7 @@ Optionally, add other resources:
 -   Service accounts to interface with BigQuery
 
 ::: notes
-When we create a project, we assign a project name and project ID. Google will assign a project number. What's the project is created, we have to add any resources we want, whether that's computational resources like a VM or Kubernetes cluster, data resources like BigQuery, or other Google Cloud Platform products and services.
+When we create a project, we assign a project name and project ID. Google will assign a project number. Once the project is created, we have to add any resources we want, whether that's computational resources like a VM or Kubernetes cluster, data resources like BigQuery, or other Google Cloud Platform products and services.
 :::
 
 # Exercise
@@ -380,6 +481,11 @@ Look for Area Deprivation Index (ADI) by searching for it or looking in the heal
 :::
 :::
 
+```{r echo = FALSE}
+library(countdown)
+countdown(minutes = 2, seconds = 00)
+```
+
 ::: notes
 You can feel free to look around for a bit here to identify data you want to use on your own for practice, but I do want you to find two specific datasets. You can filter the public data you're looking at by scrolling in the "category" facet and selecting "healthcare", or you can use the search bar. We're going to start with the Area Deprivation Index (ADI). Find that and click on it, then click on the big blue button that says "View Dataset."
 :::
@@ -420,78 +526,21 @@ countdown(minutes = 3, seconds = 00)
 Now, you'll need to go back to adding data (it's probably in another tab of your browser), and do the same thing for the Births data from the American Centers for Disease Control and Prevention. Find it, then "star" it. I'll give everyone 3 minutes to do this, then I'll add those data to my project too.
 :::
 
-# Viewing "Starred" Data {.smaller}
 
-::: {.columns .v-center-container}
-::: {.column width="50%"}
-Since there are so many public datasets, Google no longer displays those by default in your project data, even though you have access to them. That's why we "starred" them.
+# Break {.smaller}
 
-Now we can select to show "only starred data".
-:::
+Let's take a break.  So far you:
 
-::: {.column width="50%"}
-![](media/bigquery_starred_data.png){.bordered}
-:::
-:::
+* Created a GCP account
+* Created a new project
+* Added BigQuery as a resource to your project
+* Identified (starred) public data of interest
 
-::: notes
-You might have several tabs open at this point, and I personally like to at least pretend that I keep my browser tabs to a minimum, although honestly, I often have 30 tabs open at a time. I'd like you to close all your GCP tabs except for one, and go back into your project and into BigQuery. That will be good practice for you in navigating in a project. So I'll switch now to sharing my screen. I'm going to close these extra tabs, then make sure my project is appropriately selected in the project selector. I can use the menu to go to BigQuery. Now, I'll choose to show only starred data, and it'll be much easier to see just the data I want for my project.
-:::
+During break, you can either relax, or, if you want:
 
-# Structures of Data {.smaller}
-
-::: {.columns .v-center-container}
-::: {.column width="50%"}
--   Projects contain datasets
--   Datasets contain tables (point-in-time, established data) and views (live filters that show current data)
-:::
-
-::: {.column width="50%"}
-![](media/bigquery_expanded_data.png){.bordered}
-:::
-:::
-
-::: notes
-In BigQuery, you can expand a project to show its included datasets, and expand datasets to show their included tables and views. Please expand into your projects and datasets using the triangle keys until you see something similar to the image on your screen. In this case, we have three tables in the ADI data, and seven tables in the CDC data. In the next few minutes, you'll look around at this data.
-:::
-
-# Exploring Data {.smaller}
-
-You can click on a table's name to open it to the right. Take a look at the first three tabs available, which will be available for every table.
-
--   Schema (what the columns are)
--   Details (how big it is, other metadata)
--   Preview (very important because FREE)
-
-![](media/table_info.png){.bordered} 
-
-::: notes 
-
-I'd like to invite you to look at one of these tables by clicking on the table name. Not every bit of metadata that shows up as an available tab will actually be populated with information, that really depends on the source of the data and what is included with it. For now, I want you to look at the first few tabs: Schema, which shows the columns in the table, Details, which has some other metadata, and Preview, which allows you to look over the data as if you were to issue a 'SELECT \*' SQL query on that table.
-
-So I'll screen share at this point and walk you through this. I'm going to click on the first table in the broadstreet_adi dataset, and I can adjust the panes here using the sliding adjuster to make sure I can see the full table names. So I want to look at this first table, index by census block group. I click on it, and information opens up on the right. I'll look at Schema to get an idea of what my data contains. It looks like it has a lot of place identifiers, like fips codes, which in the United States are codes that can describe lots of things, but in this case are unique IDs for different geographies, like county, or state or census block group. There's also the area deprivation index percent, which might be some kind of measure that as I think might have something to do with the socioeconomic characteristics of that geographic area.
-
-Looking at the schema can give me a good overview of the data, IF my columns are well named. In this case, they are. Not every data set has a full schema. For example, this dataset doesn't have anything in way of description for the fields, which is annoying.
-
-Now we can briefly look at details. I don't care that much about this, but sometimes this pane might have interesting information about the sheer amount of data or some tagging that might be useful. Not for this data, however!
-
-Let's then go on to preview. A great thing about previews in BigQuery is that they are FREE. In BigQuery, you pay not for the storage of the data but for the processing power of the queries you run. But previews are free and allow you to look at the data overall. This can be very useful in understanding more intuitively what's in the dataset. Are county names capitalized? Are numbers in decimal format, or integers? Are there units or abbreviations in the data? Preview is where you can get that information.
-
-In Preview, you can page through the columns, see the overall number of rows, go to the last page, and so on. OK, I'm going to return to my slides now, and we're really close to our first break.
-
-:::
-
-# Explore to find some interesting columns {.smaller}
-
-::: {.columns .v-center-container}
-::: {.column width="80%"}
-Look through the tables in the Broadstreet ADI data and the CDC Births data to identify the following:
-
--   One or more fields that has information in common, in that the data appears in both datasets (might not have the same field name) -- we'll call this our "join" data
--   One or more columns / fields in the ADI data that help characterize socioeconomic disadvantage and are in the same table as our join data
--   One or more columns / fields in the CDC data that help describe something about birth statistics and are in the same table as our join data
-:::
-:::
+* Experiment with interrogating Gemini
+* Look around at other public datasets
+* Try some of the other "Add Data" methods to add your own (non-regulated, not-PHI, etc.) data to your project 
 
 ```{r echo = FALSE}
 library(countdown)
@@ -499,11 +548,7 @@ countdown(minutes = 20, seconds = 00)
 ```
 
 ::: notes
-OK, so this takes us to our first break. I'd like to give you all 20 minutes which you can spend on this exercise and a break, in whatever proportion you want. Please look through the tables in the Broadstreet ADI data and the CDC Births data, using the Schema and Preview tabs that we just explored to try to identify the following, and jot them down somewhere. Make note of the table name and the column name (we can also say "field" instead of column).
 
--   One or more columns / fields that has information in common, in that the data appears in both the ADI dataset and the CDC dataeset. Note that these data might not have the same field name in the two datasets. We'll call this our "join" data.
--   One or more columns / fields in the ADI data that help characterize socioeconomic disadvantage and are in the same table as the join data in the ADI version of the join data
--   One or more columns / fields in the CDC data that help describe something about birth statistics and are in the same table as our join data in the CDC version of the join data.
+I'm also going to be taking a break, so I won't be available for questions in chat right now, but we'll look at questions together when we all come back. See you in 20 minutes!
 
-I'll start a timer for 20 minutes, and I want you to explore that data, get caught up on the slides, and take a break. I'm also going to be taking a break, so I won't be available for questions in chat right now, but we'll look at questions together when we all come back. See you in 20 minutes!
 :::
