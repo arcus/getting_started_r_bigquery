@@ -4,6 +4,3 @@ project:
     - "*.qmd"
 
 embed-resources: true
-execute:
-  echo: true
-  freeze: auto
