@@ -31,47 +31,9 @@ library(countdown)
 -   SQL Refresher (or SQL 101)
 -   Querying in BigQuery
 
-
-
 ::: notes
 
 
-:::
-
-
-# Viewing "Starred" Data {.smaller}
-
-::: {.columns .v-center-container}
-::: {.column width="50%"}
-Since there are so many public datasets, Google no longer displays those by default in BigQuery, even though you have access to them. That's why we "starred" them.
-
-Now we can select to show "only starred data".
-:::
-
-::: {.column width="50%"}
-![](media/bigquery_starred_data.png){.bordered}
-:::
-:::
-
-::: notes
-You might have several tabs open at this point, and I personally like to at least pretend that I keep my browser tabs to a minimum, although honestly, I often have 30 tabs open at a time. I'd like you to close all your GCP tabs except for one, and go back into your project and into BigQuery. That will be good practice for you in navigating in a project. So I'll switch now to sharing my screen. I'm going to close these extra tabs, then make sure my project is appropriately selected in the project selector. I can use the menu to go to BigQuery. Now, I'll choose to show only starred data, and it'll be much easier to see just the data I want for my project.
-:::
-
-# Structures of Data {.smaller}
-
-::: {.columns .v-center-container}
-::: {.column width="50%"}
--   Projects contain datasets
--   Datasets contain tables (point-in-time, established data) and views (live filters that show current data)
-:::
-
-::: {.column width="50%"}
-![](media/bigquery_expanded_data.png){.bordered}
-:::
-:::
-
-::: notes
-In BigQuery, you can expand a project to show its included datasets, and expand datasets to show their included tables and views. Please expand into your projects and datasets using the triangle keys until you see something similar to the image on your screen. In this case, we have three tables in the ADI data, and seven tables in the CDC data. In the next few minutes, you'll look around at this data.
 :::
 
 # Exploring Data {.smaller}
@@ -387,10 +349,6 @@ Which type of join / data completion
 
 # Join Types {.smaller}
 
-There are 4 basic join types that can be used. We'll go into more detail about how each one works in the next few pages.
-
-Here, we simply provide a visual highlight to indicate the part of the data that's considered for inclusion with each type of join.
-
 
 ::: {.columns .v-center-container}
 ::: {.column width="25%"}
@@ -417,11 +375,10 @@ Here, we simply provide a visual highlight to indicate the part of the data that
 :::
 
 ::: notes
+There are 4 basic join types that can be used. We'll go into more detail about how each one works in the next few pages.  When we talk about left, we mean whatever table you mention first, and when we talk about right, we mean whatever table you reference second.  In English, the language SQL was developed in, we write left to right, so left here means first table and right means second table.
 
+Here, we simply provide a visual highlight to indicate the part of the data that's considered for inclusion with each type of join.
 :::
-
-INNER JOIN
-
 
 # Our example: ADI and Birth Characteristics  {.smaller}
 
@@ -435,6 +392,16 @@ So in this example, we have county-level data about ADI, which is a socioeconomi
 What linking data do we have?  We have information about the county.  I asked you to identify particular fields that might be able to link data from these two datasets.  What would you propose?  Let's consider the alternatives.
 
 And if we wanted to take a pertinent county-level measure of ADI, what would you choose?  What about CDC?
+:::
+
+# Left, Right
+
+![](media/adi_cdc_join.png)
+
+::: notes
+
+So, let's think about what kind of join we want between our two tables.  If we're trying to make a connection, maybe show some statistical relationship, between ADI and birth characteristics, we need the rows from each table that line up, that match.  We're interested only in the counties that have both ADI info and Birth info.  What is that kind of join called?  Right, an inner join, or just JOIN.
+
 :::
 
 # Syntax of a JOIN  {.smaller}
@@ -458,36 +425,192 @@ On your screen, you see the syntax of a JOIN.  Let's do one, using the fields we
 ![](media/join_sample.png){.bordered}
 
 ::: notes
-OK, let's start from the bottom and work our way up.  In lines 7 and 8 I have the two tables I want to join.  I've chosen to put the area_deprivation_index_by_county table from the ADI first, or on the left, and the county_natality table from the CDC second, or on the right. Now, what kind of join do I want? That determines what words appear between these two tables.  In my case, I'm not interested in data from the left side, the Births data side, unless the counties there also appear on the right side, the ADI side.  I'm interested in the full overlap.
+OK, let's start from the bottom and work our way up.  In line 7, which wraps around, I have the two tables I want to join.  I've chosen to put the area_deprivation_index_by_county table from the ADI first, or on the left, and the county_natality table from the CDC second, or on the right. Now, what kind of join do I want? That determines what words appear between these two tables.  In my case, I'm not interested in data from the left side, the ADI data side, unless the counties there also appear on the right side, the Births side.  I'm interested in the full overlap.
 
-Those two tables have something in common, and that's what I've put in line 9: the county fips code, which goes by a different name in each table, must match.  
+Those two tables have something in common, and that's what I've put in line 8: the county fips code, which goes by a different name in each table, must match.  
 
-Now, what kind of join do I want?  
+Now, what kind of data do I want?  Well, I only really *need* the ADI data by county and the births data by county that I want to put in relationship with each other.  But, I recommend that when you first do a join, you add some other fields to check that the match is correct.  Here, I've put in some county names and FIPS codes so I can eyeball my data and check that the data is correct and that I've executed my join properly.  Does Tulsa County seem to be the same place as Tulsa County, OK?  Yep!  
+
+Then in a subsequent use of this query, we could suppress the first few fields, because they aren't necessary for the data analysis, or we could leave them in, if it helps us feel more secure or demonstrate the accuracy of our data.
+
+So let's build this query together in BigQuery.  First, I'm going to open one of the tables, say the ADI county table, to start a boilerplate query.  Now, this is a boilerplate query on just one table, so I'm going to first get rid of that LIMIT statement.  Then I'll manually type the word JOIN here.  I want to add the sdoh_cdc_wonder_natality table here called county_natality, and if I want to not have to retype this, I can click in the kebab menu, copy the ID, and drop that in.  I'll need to wrap that in backticks, however!  And keep in mind backticks aren't the same as single quotes. So I'll put a backtick on either side, like this.
+
+Then I'll hit enter to get a new line and type the keyword ON.  And I want my two county fips fields to match.  So I'll start typing "county" to see what comes up, and let autocompletion help me.
+
+Yep, I'll select County_of_Residence_FIPS, then type equals, then county_fips_code.  Note, this is an equality, and it doesn't matter what order I put these two fields in. 
+
+Finally, I'll move my cursor to between SELECT and FROM and start typing some fields to let auto complete help me.  County name and fips, then area, then "ave".  I'm going to put each one on its own line, and I like to highlight all the fields and hit tab so they're indented.
+
+I'll also drop this into chat so you have it! Let's hit run and look at the results.
 :::
 
-# Aggregation  {.smaller}
+# JOIN Complications {.smaller}
 
-Aggregation gives you a single calculated value for multiple rows.  Examples include:
+We have multiples of counties, with varying ADI scores, in our query results.  That's not great -- we want each county to appear only once.  
 
-* COUNT 
-* MIN / MAX
-* SUM
+What's going on?  Dates.
 
-# Aggregation Examples  {.smaller}
+::: notes
+Let's look at the results of my query.  Why do we have multiples of some counties, with varying scores?  It's because counties appear more than once in at least one of my join tables.  If we take a closer look, we see that the ADI data by county has several years of information for each county.  The same is true for CDC Births data!  We have to match by date AND by county.  This is complicated by the fact that the CDC Births data has date as January 1 of a given year, and the ADI data has date with just the year (no month and day.)
+:::
 
-A Few Aggregate Functions: 
+# A First Try With Gemini {.smaller}
 
-* ANY_VALUE (give me any one of the values)
-* AVG (mean of values)
-* CORR (Pearson's coefficient of correlation between 2 sets of values)
-* COUNT (number of rows)
-* COUNTIF (number of rows that match your description)
-* MAX (maximum from a set of values)
-* MIN (minimum from a set of values)
-* STDDEV (shortcut for STDDEV_POP, gives sample standard deviation for set of values)
-8 SUM (sum of values)
+Gemini gets us the start of a query, but it won't quite work.  But it does give you a nice look at aliasing!
 
-# Let's do some aggregation
+![](media/gemini_year_match.png){.bordered}
+::: notes
+So, I start by asking Gemini to help.  This is how I phrased the question.  I'd like for you to click on the Gemini pencil icon and ask a question similar to mine, or you can put it in your own words.
+:::
+
+# Riffing on Gemini
+
+This is what Gemini gave me:
+
+```
+SELECT
+    t1.Ave_Birth_Weight_gms,
+    t2.area_deprivation_index_percent
+  FROM
+    `bigquery-public-data.sdoh_cdc_wonder_natality.county_natality` AS t1
+    INNER JOIN `bigquery-public-data.broadstreet_adi.area_deprivation_index_by_county` AS t2 ON t1.County_of_Residence_FIPS = t2.county_fips_code
+     AND t1.Year = t2.year
+```
+
+Error!
+
+`No matching signature for operator = for argument types: DATE, INT64. Supported signature: ANY = ANY at [7:10]`
 
 
+::: notes
 
+So, this query won't work.  I don't know if you got something similar or identical to what I got, but I encourage you to try running your code.  I'll take what I got here and run it myself in my BigQuery in a screen share.  So I'll copy this from the slide and I'll paste it into BigQuery.
+
+When I copy and paste this query and try to run it, I get a helpful error: 
+
+`No matching signature for operator = for argument types: DATE, INT64. Supported signature: ANY = ANY at [7:10]`
+
+Why is this hapening?  What BigQuery is trying to tell you is that you can't compare data that is of two different types.  Let's take a closer look.  I'll go back to my slides now.
+
+:::
+
+# Extracting part of a date {.smaller}
+
+DATE is a type that has year, day, and month.  But if I just have a four digit year, that's an integer (INT64).  
+
+I can't compare an INT column that has "2019" to a DATE column that has "2019-01-01"
+
+::: notes
+DATE is a type that has year, day, and month.  But if I just have a four digit year, that's an integer (INT64).  So how can I extract just the year from a DATE?  I tried a few times before this workshop to see if Gemini would help me with this task, but Gemini wasn't very good at helping me.  I'll hit the Google machine instead.
+:::
+
+# Googling SQL {.smaller}
+
+Include what you're trying to do and "in BigQuery."
+
+![](media/google_search_sql.png){.bordered}
+
+In our case, EXTRACT seems likely to work.  
+
+# Tweaking What Gemini Gave Us {.smaller}
+
+```
+SELECT
+  cdc.Ave_Birth_Weight_gms,
+  adi.area_deprivation_index_percent
+FROM
+  `bigquery-public-data.sdoh_cdc_wonder_natality.county_natality` AS cdc 
+  INNER JOIN `bigquery-public-data.broadstreet_adi.area_deprivation_index_by_county` AS adi
+ON cdc.County_of_Residence_FIPS = adi.county_fips_code AND 
+   EXTRACT(YEAR FROM cdc.Year) = adi.year
+   
+```
+
+::: notes 
+OK, so let's try changing the aliases to make them a bit more useful.  I wasn't happy with t1 and t2, I'd rather use something more descriptive, like adi and cdc.  I'm also using EXTRACT to get just the year.  I'm also going to adjust whitespace.  I'd like for you to follow along as I make these adjustments to my query in BigQuery.  
+
+OK, so first I'm going to rename my first table as cdc, instead of t1, and make sure all my t1 references become cdc.  Then I'll change t2 to adi.  I'll change cdc.Year to EXTRACT(YEAR FROM cdc.YEAR), and I like to change the whitespace and indentation.  Let me run that and see if that works.  OK, I'm also going to copy paste this into chat so you can grab it from there.
+
+:::
+
+# But let's pop in some "sanity checks"
+
+```
+SELECT
+  cdc.Ave_Birth_Weight_gms,
+  adi.area_deprivation_index_percent,
+  cdc.County_of_Residence,
+  adi.county_name,
+  cdc.Year,
+  adi.year
+FROM
+  `bigquery-public-data.sdoh_cdc_wonder_natality.county_natality` AS cdc 
+  INNER JOIN `bigquery-public-data.broadstreet_adi.area_deprivation_index_by_county` AS adi
+ON cdc.County_of_Residence_FIPS = adi.county_fips_code AND 
+   EXTRACT(YEAR FROM cdc.Year) = adi.year
+```
+
+
+::: notes
+It's helpful to add back the county name and year, just to make sure that our matching is working.  Let's do that, just for comfort.  I'mm going to add in the county name and the year from both data sources, and that way I can be super-duper sure that the join is working properly.
+:::
+
+# Grouping and Aggregation
+
+One last thing -- we now are matching on year, but what if we have data on 2018, 2019, and 2020 for a given county, in both tables?  We'll match that data up properly, but some counties might be over-represented in our analysis.
+
+::: notes
+One last thing -- we now are matching on year, but what if we have data on 2018, 2019, and 2020 for a given county, in both tables?  We'll match that data up properly, but some counties might be over-represented in our analysis.  Maybe some counties have lots of years of matching data and others just have one.  We'll add a new idea here: grouping and aggregation. 
+
+We can do grouping and aggregation in SQL, and that's a good idea, but I want us to pivot to using R in the next hour.  So we'll save this last step, making sure that counties aren't over-represented, for working in R in the last hour of our workshop.  I've given you enough SQL for today.  So let's stop and save our work, and take a break.  We'll save our table of results, and we'll save our query.
+:::
+
+# Saving Your Work: Tables
+
+In your Query results, you can save your work.  In our case, we want to save it as a BigQuery table, in our project.  
+
+* Create a new dataset (single region) with a good name
+* Save the table in that dataset with a good name
+
+::: notes
+But remember, tables live inside datasets inside projects, and in our own project, we don't have any datasets.  We've been working from datasets in a different project, the bigquery public data project.  And we only have read access to that project, not write.  We can't add our table to the ADI dataset or the CDC dataset.  No, we'll want to make our own dataset in our project, and add our table of results there.
+::: 
+
+# Create a Dataset
+
+::: {.columns .v-center-container}
+::: {.column width="50%"}
+![](media/create_dataset_1.png){.bordered}
+:::
+::: {.column width="50%"}
+![](media/create_dataset_2.png){.bordered}
+
+:::
+:::
+::: notes
+
+Create a dataset with a name that describes your overall data efforts.  Since I'm combining data from the ADI dataset and the CDC Births dataset, I give my dataset the name adi_cdc_births.
+
+:::
+
+# Create table
+
+::: notes
+And I give my table a useful name that describes the data there.
+
+For example, I'm calling this "adi_birth_weight_by_county".
+:::
+
+# Saving Your Work: Queries
+
+![](media/save_query.png){.bordered}
+::: notes
+Building up a query is often iterative and difficult.  You might want to save your queries to keep working on them later, tweaking them to get the best results or asking for help from someone who knows more SQL and can explain what's going wrong.  You can copy/paste your SQL into a document somewhere, sure, but you can also save them within BigQuery.  In the query window, there's a Save button.  Click "Save query" and give it a good English language description.  You can write a sentence here, it doesn't have to be pithy like a table name should be.  Choose a region that's close to you, geographically.
+:::
+
+# Look at Your Resources
+
+![](media/lots_of_resources.png){.bordered}
+::: notes
+Now look back in your Explorer and expand your project name and your dataset name and the Queries. Hopefully you see something like what's on your screen -- you have some saved assets in your project now, including a table of data and a query.  If you don't see this, you might have to toggle the "Show Starred Only" button and then put a star on your project, to make sure the resources in your project show up when "starred only" is selected.
+:::

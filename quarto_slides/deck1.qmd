@@ -527,6 +527,41 @@ Now, you'll need to go back to adding data (it's probably in another tab of your
 :::
 
 
+# Viewing "Starred" Data {.smaller}
+
+::: {.columns .v-center-container}
+::: {.column width="50%"}
+Since there are so many public datasets, Google no longer displays those by default in BigQuery, even though you have access to them. That's why we "starred" them.
+
+Now we can select to show "only starred data".
+:::
+
+::: {.column width="50%"}
+![](media/bigquery_starred_data.png){.bordered}
+:::
+:::
+
+::: notes
+You might have several tabs open at this point, and I personally like to at least pretend that I keep my browser tabs to a minimum, although honestly, I often have 30 tabs open at a time. I'd like you to close all your GCP tabs except for one, and go back into your project and into BigQuery. That will be good practice for you in navigating in a project. So I'll switch now to sharing my screen. I'm going to close these extra tabs, then make sure my project is appropriately selected in the project selector. I can use the menu to go to BigQuery. Now, I'll choose to show only starred data, and it'll be much easier to see just the data I want for my project.
+:::
+
+# Structures of Data {.smaller}
+
+::: {.columns .v-center-container}
+::: {.column width="50%"}
+-   Projects contain datasets
+-   Datasets contain tables (point-in-time, established data) and views (live filters that show current data)
+:::
+
+::: {.column width="50%"}
+![](media/bigquery_expanded_data.png){.bordered}
+:::
+:::
+
+::: notes
+In BigQuery, you can expand a project to show its included datasets, and expand datasets to show their included tables and views. Please expand into your projects and datasets using the triangle keys until you see something similar to the image on your screen. In this case, we have three tables in the ADI data, and seven tables in the CDC data. In the next few minutes, you'll look around at this data.
+:::
+
 # Break {.smaller}
 
 Let's take a break.  So far you:
